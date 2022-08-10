@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
@@ -83,9 +84,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenValiditySeconds(3600) //초단위로 설정 default는 14일
                 //.alwaysRemember(true) //리멤버 미 기능이 활성화되지 않아도 항상 실행
                 .userDetailsService(userDetailsService);
+
+        //동시 세션 제어
+        http.sessionManagement()
+                .maximumSessions(1) //최대 허용 가능 세션 수, -1 설정하면 무제한 로그인 세션 적용
+                .maxSessionsPreventsLogin(false); //true면 동시 로그인 차단, false 값을 주면 기존 세션 만료한다. false 여러 사이트에서 많이 사용하는 방법인 듯
+                //.invalidSessionUrl("/invalid") //세션이 유효하지 않을 경우 이동하는 페이지
+                //.expiredUrl("/expired"); //세션이 만료된 경우 이동하는 페이지
+
+        //세션 고정 보호
+        http.sessionManagement()
+                .sessionFixation()
+                .changeSessionId(); //매번 새로운 세션 아이디를 생. 이게 기본
+
+        //세션 정책
+        http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED); //기본 값
     }
-
-
 }
 
 
