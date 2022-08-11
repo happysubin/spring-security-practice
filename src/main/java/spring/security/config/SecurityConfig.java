@@ -29,78 +29,111 @@ import java.io.IOException;
 @EnableWebSecurity //여러 보안 설정 클래스들을 사용
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+
     @Autowired
     UserDetailsService userDetailsService;
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication().withUser("user").password("{noop}1111").roles("USER"); //noop는 prefix형태로 사용 알고리즘을 지정.
+        auth.inMemoryAuthentication().withUser("sys").password("{noop}1111").roles("SYS"); //noop는 prefix형태로 사용 알고리즘을 지정.
+        auth.inMemoryAuthentication().withUser("admin").password("{noop}1111").roles("ADMIN"); //noop는 prefix형태로 사용 알고리즘을 지정.
+
+
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
+//        http.authorizeRequests()
+//                .anyRequest().authenticated();
+
+//        http.formLogin()
+//                //.loginPage("/loginPage")
+//                .defaultSuccessUrl("/")
+//                .failureUrl("/login")
+//                .usernameParameter("userID")
+//                .passwordParameter("passwd")
+//                .loginProcessingUrl("/login-proc")
+//                .successHandler(new AuthenticationSuccessHandler() {
+//                    @Override
+//                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+//                        System.out.println("authentication.getName() = " + authentication.getName());
+//                        response.sendRedirect("/");
+//                    }
+//                })
+//                .failureHandler(new AuthenticationFailureHandler() {
+//                    @Override
+//                    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+//                        System.out.println("exception.getMessage() = " + exception.getMessage());
+//                        response.sendRedirect("/login");
+//                    }
+//                })
+//                .permitAll();
+//
+//        http.logout()
+//                .logoutUrl("/logout")
+//                .logoutSuccessUrl("/login")
+//                //.deleteCookies("JESSIONID", "remember-me")
+//                .addLogoutHandler(new LogoutHandler() {
+//                    @Override
+//                    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+//                        HttpSession session = request.getSession();
+//                        session.invalidate();
+//                    }
+//                })
+//                .logoutSuccessHandler(new LogoutSuccessHandler() {
+//                    @Override
+//                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+//                        response.sendRedirect("/login");
+//                    }
+//                })
+//                .deleteCookies("remember-me");
+//
+////        http.rememberMe()
+////                .rememberMeParameter("remember-me") //기본 파라미터는 remember-me
+////                .tokenValiditySeconds(3600) //초단위로 설정 default는 14일
+////                //.alwaysRemember(true) //리멤버 미 기능이 활성화되지 않아도 항상 실행
+////                .userDetailsService(userDetailsService);
+//
+//        //동시 세션 제어
+//        http.sessionManagement()
+//                .maximumSessions(1) //최대 허용 가능 세션 수, -1 설정하면 무제한 로그인 세션 적용
+//                .maxSessionsPreventsLogin(false); //true면 동시 로그인 차단, false 값을 주면 기존 세션 만료한다. false 여러 사이트에서 많이 사용하는 방법인 듯
+//                //.invalidSessionUrl("/invalid") //세션이 유효하지 않을 경우 이동하는 페이지
+//                //.expiredUrl("/expired"); //세션이 만료된 경우 이동하는 페이지
+//
+//        //세션 고정 보호
+//        http.sessionManagement()
+//                .sessionFixation()
+//                .changeSessionId(); //매번 새로운 세션 아이디를 생. 이게 기본
+//
+//        //세션 정책
+//        http.sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED); //기본 값
+//
+
+        //인가 API 권한 설정.
+        //선언전 방식(URL, Method). 동적 방식(URL, Method) - DB 연동 프로그래밍 이렇게 2가지가 있다.
+
+        //선언전 방식에서 URL 관련 권한 설정
+//        http.antMatcher("/shop/**")
+//                .authorizeRequests()
+//                .antMatchers("/shop/login", "/shop/users/**").permitAll()
+//                .antMatchers("/shop/mypage").hasRole("USER")
+//                .antMatchers("/shop/admin/pay").access("hasRole('ADMIN')")
+//                .antMatchers("/shop/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
+//                .anyRequest().authenticated();
+        //구체적인게 먼저 나오고, 포괄적인게 뒤에 나온다. 예전에 한 express 설정과 똑같음.
+
         http.authorizeRequests()
+                .antMatchers("/user").hasRole("USER")
+                .antMatchers("/admin/pay").hasRole("ADMIN")
+                .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
                 .anyRequest().authenticated();
 
-        http.formLogin()
-                //.loginPage("/loginPage")
-                .defaultSuccessUrl("/")
-                .failureUrl("/login")
-                .usernameParameter("userID")
-                .passwordParameter("passwd")
-                .loginProcessingUrl("/login-proc")
-                .successHandler(new AuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                        System.out.println("authentication.getName() = " + authentication.getName());
-                        response.sendRedirect("/");
-                    }
-                })
-                .failureHandler(new AuthenticationFailureHandler() {
-                    @Override
-                    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                        System.out.println("exception.getMessage() = " + exception.getMessage());
-                        response.sendRedirect("/login");
-                    }
-                })
-                .permitAll();
-
-        http.logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                //.deleteCookies("JESSIONID", "remember-me")
-                .addLogoutHandler(new LogoutHandler() {
-                    @Override
-                    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-                        HttpSession session = request.getSession();
-                        session.invalidate();
-                    }
-                })
-                .logoutSuccessHandler(new LogoutSuccessHandler() {
-                    @Override
-                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                        response.sendRedirect("/login");
-                    }
-                })
-                .deleteCookies("remember-me");
-
-        http.rememberMe()
-                .rememberMeParameter("remember-me") //기본 파라미터는 remember-me
-                .tokenValiditySeconds(3600) //초단위로 설정 default는 14일
-                //.alwaysRemember(true) //리멤버 미 기능이 활성화되지 않아도 항상 실행
-                .userDetailsService(userDetailsService);
-
-        //동시 세션 제어
-        http.sessionManagement()
-                .maximumSessions(1) //최대 허용 가능 세션 수, -1 설정하면 무제한 로그인 세션 적용
-                .maxSessionsPreventsLogin(false); //true면 동시 로그인 차단, false 값을 주면 기존 세션 만료한다. false 여러 사이트에서 많이 사용하는 방법인 듯
-                //.invalidSessionUrl("/invalid") //세션이 유효하지 않을 경우 이동하는 페이지
-                //.expiredUrl("/expired"); //세션이 만료된 경우 이동하는 페이지
-
-        //세션 고정 보호
-        http.sessionManagement()
-                .sessionFixation()
-                .changeSessionId(); //매번 새로운 세션 아이디를 생. 이게 기본
-
-        //세션 정책
-        http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED); //기본 값
+        http.formLogin();
     }
+
 }
 
 
@@ -116,3 +149,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
  *
  * https://www.codejava.net/frameworks/spring-boot/fix-websecurityconfigureradapter-deprecated
  */
+
+//ConcurrentSessionControlAuthenticationStrategy 동시적 세션처리를 하는 클래스. count가 있다.
+//ChangeSessionIdAuthenticationStrategy 세션 고정 보호를 하는 클래스
+//RegisterSessionAuthenticationStrategy 사용자의 세션을 등록하고 정의하는 클래스
