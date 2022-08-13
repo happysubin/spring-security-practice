@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SecurityController {
 
-    @GetMapping
+    @GetMapping()
     public String index(){
         return "home";
     }
@@ -31,5 +31,13 @@ public class SecurityController {
         return "adminAll";
     }
 
+    @GetMapping("/denied")
+    public String denied(){
+        return "Access is denied";
+    }
 
+    @GetMapping("/login")
+    public String login(){
+        return "login";
+    }
 }
