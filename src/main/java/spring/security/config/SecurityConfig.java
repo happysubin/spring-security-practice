@@ -163,6 +163,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         response.sendRedirect("/denied");
                     }
                 }); //인가 예외 처리
+
+        http.csrf(); //csrf 공격 방지. 기본으로 활성화 되어 있다.
+        //http.csrf().disable() 비활성화
     }
 }
 
