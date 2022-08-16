@@ -2,9 +2,11 @@ package spring.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
+
+@Order(1)
 @Configuration
 @EnableWebSecurity //여러 보안 설정 클래스들을 사용
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -131,44 +135,61 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .anyRequest().authenticated();
         //구체적인게 먼저 나오고, 포괄적인게 뒤에 나온다. 예전에 한 express 설정과 똑같음.
 
-        http.authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/user").hasRole("USER")
-                .antMatchers("/admin/pay").hasRole("ADMIN")
-                .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
-                .anyRequest().authenticated();
-
-        http.formLogin()
-                .successHandler(new AuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                        RequestCache requestCache = new HttpSessionRequestCache();
-                        SavedRequest savedRequest = requestCache.getRequest(request, response);
-                        String redirectUrl = savedRequest.getRedirectUrl();
-                        response.sendRedirect(redirectUrl);
-                    }
-                });
-
-        http
-                .exceptionHandling()
-//                .authenticationEntryPoint(new AuthenticationEntryPoint() {
+//        http.authorizeRequests()
+//                .antMatchers("/login").permitAll()
+//                .antMatchers("/user").hasRole("USER")
+//                .antMatchers("/admin/pay").hasRole("ADMIN")
+//                .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
+//                .anyRequest().authenticated();
+//
+//        http.formLogin()
+//                .successHandler(new AuthenticationSuccessHandler() {
 //                    @Override
-//                    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-//                        response.sendRedirect("/login");
+//                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+//                        RequestCache requestCache = new HttpSessionRequestCache();
+//                        SavedRequest savedRequest = requestCache.getRequest(request, response);
+//                        String redirectUrl = savedRequest.getRedirectUrl();
+//                        response.sendRedirect(redirectUrl);
 //                    }
-//                }) //인증 예외 처리
-                .accessDeniedHandler(new AccessDeniedHandler() {
-                    @Override
-                    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-                        response.sendRedirect("/denied");
-                    }
-                }); //인가 예외 처리
-
-        http.csrf(); //csrf 공격 방지. 기본으로 활성화 되어 있다.
+//                });
+//
+//        http
+//                .exceptionHandling()
+////                .authenticationEntryPoint(new AuthenticationEntryPoint() {
+////                    @Override
+////                    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+////                        response.sendRedirect("/login");
+////                    }
+////                }) //인증 예외 처리
+//                .accessDeniedHandler(new AccessDeniedHandler() {
+//                    @Override
+//                    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+//                        response.sendRedirect("/denied");
+//                    }
+//                }); //인가 예외 처리
+//
+//        http.csrf(); //csrf 공격 방지. 기본으로 활성화 되어 있다.
         //http.csrf().disable() 비활성화
+
+        http.antMatcher("/admin/**")
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and().httpBasic(); //http 인증 방식
     }
 }
 
+@Order(99) //초기화 순서를 설. 포괄적인 것은 순서를 나중에!
+@EnableWebSecurity
+@Configuration
+class SecurityConfig2 extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .anyRequest().permitAll()
+                .and()
+                .formLogin();
+    }
+}
 
 /**
  * 인증, 인가 api를 제공.
