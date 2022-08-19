@@ -3,16 +3,21 @@ package spring.security.security.configs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import spring.security.security.common.FormAuthenticationDetailsSource;
+import spring.security.security.handler.FormAccessDeniedHandler;
 import spring.security.security.provider.CustomAuthenticationProvider;
 
+@Order(2)
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -30,9 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     //private final UserDetailsService userDetailsService;
     private final CustomAuthenticationProvider customAuthenticationProvider;
-    private final AuthenticationDetailsSource authenticationDetailsSource;
+    private final FormAuthenticationDetailsSource authenticationDetailsSource;
     private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final AuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final AccessDeniedHandler formAccessDeniedHandler;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -63,7 +69,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //.defaultSuccessUrl("/")
                 .successHandler(customAuthenticationSuccessHandler)
                 .failureHandler(customAuthenticationFailureHandler)
-                .permitAll();
+                .permitAll()
+                        .and()
+                .exceptionHandling().accessDeniedHandler(formAccessDeniedHandler);
+        //https://www.inflearn.com/course/%EC%BD%94%EC%96%B4-%EC%8A%A4%ED%94%84%EB%A7%81-%EC%8B%9C%ED%81%90%EB%A6%AC%ED%8B%B0/unit/29863?tab=community&q=63816&category=questionDetail
     }
 }
 
