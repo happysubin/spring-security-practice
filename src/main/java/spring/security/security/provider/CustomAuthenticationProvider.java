@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -11,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Component;
+import spring.security.security.common.FormAuthenticationDetailsSource;
+import spring.security.security.common.FormWebAuthenticationDetails;
 import spring.security.security.service.AccountContext;
 
 @Component
@@ -31,10 +34,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("비밀번호 틀림");
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
+        FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
 
-        return authenticationToken;
+        String secretKey = formWebAuthenticationDetails.getSecretKey();
+
+        if(secretKey == null || !"secret".equals(secretKey)){
+            throw new InsufficientAuthenticationException("시크릿키가 없다.");
+        }
+
+        return new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
     }
 
     @Override
