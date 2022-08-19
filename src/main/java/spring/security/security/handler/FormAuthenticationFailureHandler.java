@@ -22,10 +22,6 @@ import java.io.IOException;
 @Component
 public class FormAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    private RequestCache requestCache = new HttpSessionRequestCache();
-
-    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         String errorMessage = "Invalid Username or Password";
