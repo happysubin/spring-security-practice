@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import spring.security.security.provider.CustomAuthenticationProvider;
 
@@ -31,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomAuthenticationProvider customAuthenticationProvider;
     private final AuthenticationDetailsSource authenticationDetailsSource;
     private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final AuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -51,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasRole("MANAGER")
                 .antMatchers("/config").hasRole("ADMIN")
+                .antMatchers("/**").permitAll()  //이 부분을 추가해서 문제 해결 스프링 시큐리티가 /login과 /login?qyertString을 다르게 생각한다고 한다.
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -59,6 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationDetailsSource(authenticationDetailsSource)
                 //.defaultSuccessUrl("/")
                 .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
                 .permitAll();
     }
 }
