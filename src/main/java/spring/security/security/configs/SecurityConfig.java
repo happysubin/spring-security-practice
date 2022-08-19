@@ -1,30 +1,38 @@
-package spring.security.config.security;
+package spring.security.security.configs;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//
+//        String password = passwordEncoder().encode("1111");
+//
+//        auth.inMemoryAuthentication().withUser("user").password(password).roles("USER"); //noop는 prefix형태로 사용 알고리즘을 지정.
+//        auth.inMemoryAuthentication().withUser("manager").password(password).roles("MANAGER"); //noop는 prefix형태로 사용 알고리즘을 지정.
+//        auth.inMemoryAuthentication().withUser("admin").password(password).roles("ADMIN"); //noop는 prefix형태로 사용 알고리즘을 지정.
+//    }
+
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
-        String password = passwordEncoder().encode("1111");
-
-        auth.inMemoryAuthentication().withUser("user").password(password).roles("USER"); //noop는 prefix형태로 사용 알고리즘을 지정.
-        auth.inMemoryAuthentication().withUser("manager").password(password).roles("MANAGER"); //noop는 prefix형태로 사용 알고리즘을 지정.
-        auth.inMemoryAuthentication().withUser("admin").password(password).roles("ADMIN"); //noop는 prefix형태로 사용 알고리즘을 지정.
+        auth.userDetailsService(userDetailsService);
     }
 
     @Bean
