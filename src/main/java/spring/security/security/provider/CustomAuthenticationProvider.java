@@ -23,11 +23,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {  //authentication 매니저가 보여준 인증객체. 아이디 패스워드가 담겨있.
         String username = authentication.getName();
-        String password = (String) authentication.getPrincipal();
+        String password = (String) authentication.getCredentials();
 
         AccountContext accountContext = (AccountContext)userDetailsService.loadUserByUsername(username); //아이디 검증
 
-        if(passwordEncoder.matches(password, accountContext.getAccount().getPassword())){ //비밀번호 인증
+        if(!passwordEncoder.matches(password, accountContext.getAccount().getPassword())){ //비밀번호 인증
             throw new BadCredentialsException("비밀번호 틀림");
         }
 

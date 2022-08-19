@@ -31,13 +31,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        auth.inMemoryAuthentication().withUser("admin").password(password).roles("ADMIN"); //noop는 prefix형태로 사용 알고리즘을 지정.
 //    }
 
-    private final UserDetailsService userDetailsService;
-    //private final CustomAuthenticationProvider customAuthenticationProvider;
+    //private final UserDetailsService userDetailsService;
+    private final CustomAuthenticationProvider customAuthenticationProvider;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
-        //auth.authenticationProvider(customAuthenticationProvider);
+        //auth.userDetailsService(userDetailsService);
+        auth.authenticationProvider(customAuthenticationProvider);
     }
 
     //js css image 등 보안 필터를 적용할 필요가 없는 리소스를 설정. 즉 여기 설정된 것은 아예 보안 필터를 거치지 않고 통과된다. 보안 필터의 범위 밖
@@ -60,10 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .csrf();
-
-        http.getSharedObject(CustomAuthenticationProvider.class);
-
-
     }
 
 
