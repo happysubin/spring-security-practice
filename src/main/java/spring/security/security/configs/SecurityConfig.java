@@ -2,6 +2,7 @@ package spring.security.security.configs;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -13,7 +14,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import spring.security.security.common.FormAuthenticationDetailsSource;
+import spring.security.security.filter.AjaxLoginProcessingFilter;
 import spring.security.security.handler.FormAccessDeniedHandler;
 import spring.security.security.provider.CustomAuthenticationProvider;
 
@@ -71,8 +74,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler(customAuthenticationFailureHandler)
                 .permitAll()
                         .and()
-                .exceptionHandling().accessDeniedHandler(formAccessDeniedHandler);
+                .exceptionHandling().accessDeniedHandler(formAccessDeniedHandler)
+                .and()
+                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class); // 유저네임패스워드 클래스보다 앞에 위치
         //https://www.inflearn.com/course/%EC%BD%94%EC%96%B4-%EC%8A%A4%ED%94%84%EB%A7%81-%EC%8B%9C%ED%81%90%EB%A6%AC%ED%8B%B0/unit/29863?tab=community&q=63816&category=questionDetail
+
+        http.csrf().disable();
+    }
+
+    @Bean
+    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
+        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
+        ajaxLoginProcessingFilter.setAuthenticationManager(super.authenticationManagerBean());
+        return ajaxLoginProcessingFilter;
     }
 }
 

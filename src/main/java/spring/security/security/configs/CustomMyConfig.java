@@ -6,6 +6,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import spring.security.security.filter.AjaxLoginProcessingFilter;
 import spring.security.security.handler.FormAccessDeniedHandler;
 
 @Configuration
