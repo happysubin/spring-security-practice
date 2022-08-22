@@ -82,7 +82,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
     }
 
-    @Bean
     public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
         AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
         ajaxLoginProcessingFilter.setAuthenticationManager(super.authenticationManagerBean());
