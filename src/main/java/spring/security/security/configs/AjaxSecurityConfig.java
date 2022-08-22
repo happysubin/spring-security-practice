@@ -12,8 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import spring.security.security.common.AjaxLoginUrlAuthenticationEntryPoint;
 import spring.security.security.filter.AjaxLoginProcessingFilter;
+import spring.security.security.handler.AjaxAccessDeniedHandler;
 import spring.security.security.handler.AjaxAuthenticationFailureHandler;
 import spring.security.security.handler.AjaxAuthenticationSuccessHandler;
 import spring.security.security.provider.AjaxAuthenticationProvider;
@@ -37,11 +40,21 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .antMatcher("/api/**")
                 .authorizeRequests()
+                .antMatchers("/api/messages").hasRole("MANAGER")
+                .antMatchers("/api/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
 
+        http.exceptionHandling()
+                .authenticationEntryPoint(new AjaxLoginUrlAuthenticationEntryPoint())
+                .accessDeniedHandler(ajaxAccessDeniedHandler());
+
         http.csrf().disable();
+    }
+
+    public AccessDeniedHandler ajaxAccessDeniedHandler() {
+        return new AjaxAccessDeniedHandler();
     }
 
     public AuthenticationProvider ajaxAuthenticationProvider(){
