@@ -2,6 +2,7 @@ package spring.security.security.configs;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionManager;
@@ -12,6 +13,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import spring.security.security.factory.UrlResourcesMapFactoryBean;
+import spring.security.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
+import spring.security.security.service.SecurityResourceService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +23,10 @@ import java.util.List;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Slf4j
-public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration{
+public class WebUrlSecurityConfig extends GlobalMethodSecurityConfiguration{
+
+    @Autowired
+    private SecurityResourceService securityResourceService;
 
     @Bean
     public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
@@ -30,8 +37,15 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration{
     }
 
     @Bean
-    public FilterInvocationSecurityMetadataSource urlSecurityMetadataSource() {
-        return new UrlFilterInvocationSecurityMetadataSource();
+    public FilterInvocationSecurityMetadataSource urlSecurityMetadataSource() throws Exception {
+        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject());
+    }
+
+    @Bean
+    public UrlResourcesMapFactoryBean urlResourcesMapFactoryBean(){
+        UrlResourcesMapFactoryBean urlResourcesMapFactoryBean = new UrlResourcesMapFactoryBean();
+        urlResourcesMapFactoryBean.setSecurityResourceService(securityResourceService);
+        return urlResourcesMapFactoryBean;
     }
 
     @Bean
@@ -43,4 +57,5 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration{
     private List<AccessDecisionVoter<?>> getAccessDecisionVoters() {
         return Arrays.asList(new RoleVoter());
     }
+
 }

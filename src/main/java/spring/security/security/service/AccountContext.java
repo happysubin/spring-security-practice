@@ -1,11 +1,14 @@
 package spring.security.security.service;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import spring.security.domain.entity.Account;
 
 import java.util.List;
+
 
 @Data
 public class AccountContext extends User {
