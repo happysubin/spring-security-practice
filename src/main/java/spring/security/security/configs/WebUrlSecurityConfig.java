@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import spring.security.security.factory.UrlResourcesMapFactoryBean;
+import spring.security.security.filter.PermitAllFilter;
 import spring.security.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import spring.security.security.service.SecurityResourceService;
 
@@ -28,12 +29,14 @@ public class WebUrlSecurityConfig extends GlobalMethodSecurityConfiguration{
     @Autowired
     private SecurityResourceService securityResourceService;
 
+    private String[] permitAllPattern = {"/", "/home", "/users", "/login", "/errorpage/**"};
+
     @Bean
-    public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
-        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
-        filterSecurityInterceptor.setSecurityMetadataSource(urlSecurityMetadataSource());
-        filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
-        return filterSecurityInterceptor;
+    public PermitAllFilter customFilterSecurityInterceptor() throws Exception {
+        PermitAllFilter permitAllFilter = new PermitAllFilter(permitAllPattern);
+        permitAllFilter.setSecurityMetadataSource(urlSecurityMetadataSource());
+        permitAllFilter.setAccessDecisionManager(affirmativeBased());
+        return permitAllFilter;
     }
 
     @Bean
