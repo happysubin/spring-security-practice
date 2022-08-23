@@ -16,24 +16,24 @@ import java.io.IOException;
 
 public class AjaxAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-    private ObjectMapper mapper = new ObjectMapper();
+	private ObjectMapper mapper = new ObjectMapper();
+    
+	@Override
+	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 
-    @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+		String errorMessage = "Invalid Username or Password";
 
-        String errorMessage = "Invalid Username or Password";
+		response.setStatus(HttpStatus.UNAUTHORIZED.value());
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		if(exception instanceof BadCredentialsException) {
+			errorMessage = "Invalid Username or Password";
+		} else if(exception instanceof DisabledException) {
+			errorMessage = "Locked";
+		} else if(exception instanceof CredentialsExpiredException) {
+			errorMessage = "Expired password";
+		}
 
-        if(exception instanceof BadCredentialsException) {
-            errorMessage = "Invalid Username or Password";
-        } else if(exception instanceof DisabledException) {
-            errorMessage = "Locked";
-        } else if(exception instanceof CredentialsExpiredException) {
-            errorMessage = "Expired password";
-        }
-
-        mapper.writeValue(response.getWriter(), errorMessage);
-    }
+		mapper.writeValue(response.getWriter(), errorMessage);
+	}
 }

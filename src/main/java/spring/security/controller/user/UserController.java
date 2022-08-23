@@ -1,7 +1,5 @@
 package spring.security.controller.user;
 
-
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,21 +9,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import spring.security.domain.Account;
-import spring.security.domain.AccountDto;
+import spring.security.domain.dto.AccountDto;
+import spring.security.domain.entity.Account;
+import spring.security.repository.RoleRepository;
 import spring.security.security.token.AjaxAuthenticationToken;
 import spring.security.service.UserService;
 
 import java.security.Principal;
 
 @Controller
-@RequiredArgsConstructor
 public class UserController {
+	
+	@Autowired
+	private UserService userService;
 
-	private final UserService userService;
-	private final PasswordEncoder passwordEncoder;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@GetMapping(value="/users")
 	public String createUser() throws Exception {
@@ -39,6 +42,7 @@ public class UserController {
 		ModelMapper modelMapper = new ModelMapper();
 		Account account = modelMapper.map(accountDto, Account.class);
 		account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+
 		userService.createUser(account);
 
 		return "redirect:/";

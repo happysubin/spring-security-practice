@@ -1,12 +1,9 @@
 package spring.security.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import spring.security.domain.Account;
+import spring.security.domain.entity.Account;
 
-import java.util.Optional;
-
-@Repository
-public interface UserRepository extends JpaRepository <Account, Long> {
-    Optional<Account> findByUsername(String username);
+public interface UserRepository extends JpaRepository<Account, Long> {
+  Account findByUsername(String username);
+  int countByUsername(String username);
 }
