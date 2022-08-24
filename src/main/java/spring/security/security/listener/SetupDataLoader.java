@@ -7,14 +7,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import spring.security.domain.entity.Account;
-import spring.security.domain.entity.Resources;
-import spring.security.domain.entity.Role;
-import spring.security.domain.entity.RoleHierarchy;
-import spring.security.repository.ResourcesRepository;
-import spring.security.repository.RoleHierarchyRepository;
-import spring.security.repository.RoleRepository;
-import spring.security.repository.UserRepository;
+import spring.security.domain.entity.*;
+import spring.security.repository.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +34,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AccessIpRepository accessIpRepository;
+
 
     private static AtomicInteger count = new AtomicInteger(0);
 
@@ -53,7 +50,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         setupSecurityResources();
 
-        //setupAccessIpData();
+        setupAccessIpData();
 
         alreadySetup = true;
     }
@@ -140,5 +137,15 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         RoleHierarchy childRoleHierarchy = roleHierarchyRepository.save(roleHierarchy);
         childRoleHierarchy.setParentName(parentRoleHierarchy);
+    }
+
+    private void setupAccessIpData() {
+        AccessIp byIpAddress = accessIpRepository.findByIpAddress("127.0.0.1");
+        if (byIpAddress == null) {
+            AccessIp accessIp = AccessIp.builder()
+                    .ipAddress("127.0.0.1")
+                    .build();
+            accessIpRepository.save(accessIp);
+        }
     }
 }

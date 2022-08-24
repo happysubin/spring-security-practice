@@ -19,6 +19,7 @@ import spring.security.security.factory.UrlResourcesMapFactoryBean;
 import spring.security.security.filter.PermitAllFilter;
 import spring.security.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import spring.security.security.service.SecurityResourceService;
+import spring.security.security.voter.IpAddressVoter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,8 +62,9 @@ public class WebUrlSecurityConfig extends GlobalMethodSecurityConfiguration{
     }
 
     private List<AccessDecisionVoter<?>> getAccessDecisionVoters() {
-        List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
-        accessDecisionVoters.add(roleVoter());
+        IpAddressVoter ipAddressVoter = new IpAddressVoter(securityResourceService);
+        List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = Arrays.asList(ipAddressVoter, roleVoter());
+
         return accessDecisionVoters;
     }
 
