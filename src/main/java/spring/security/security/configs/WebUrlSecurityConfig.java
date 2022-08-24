@@ -44,7 +44,7 @@ public class WebUrlSecurityConfig extends GlobalMethodSecurityConfiguration{
     }
 
     @Bean
-    public FilterInvocationSecurityMetadataSource urlSecurityMetadataSource() throws Exception {
+    public UrlFilterInvocationSecurityMetadataSource urlSecurityMetadataSource() throws Exception {
         return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(), securityResourceService);
     }
 

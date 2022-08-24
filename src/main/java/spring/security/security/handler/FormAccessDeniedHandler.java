@@ -28,14 +28,14 @@ public class FormAccessDeniedHandler implements AccessDeniedHandler {
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
-		if (WebUtil.isAjax(request)) {
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			response.getWriter().write(this.mapper.writeValueAsString(ResponseEntity.status(HttpStatus.FORBIDDEN)));
-
-		} else {
-			String deniedUrl = errorPage + "?exception=" + accessDeniedException.getMessage();
-			redirectStrategy.sendRedirect(request, response, deniedUrl);
-		}
+//		if (WebUtil.isAjax(request)) {
+//			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//			response.getWriter().write(this.mapper.writeValueAsString(ResponseEntity.status(HttpStatus.FORBIDDEN)));
+//
+//		} else {
+//			String deniedUrl = errorPage + "?exception=" + accessDeniedException.getMessage();
+//			redirectStrategy.sendRedirect(request, response, deniedUrl);
+//		}
 	}
 	
 	public void setErrorPage(String errorPage) {

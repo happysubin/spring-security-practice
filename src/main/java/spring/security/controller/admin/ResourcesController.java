@@ -4,6 +4,7 @@ package spring.security.controller.admin;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +57,6 @@ public class ResourcesController {
 		resources.setRoleSet(roles);
 
 		resourcesService.createResources(resources);
-		metadataSource.reload();
 
 		return "redirect:/admin/resources";
 	}
